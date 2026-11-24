@@ -7,8 +7,10 @@ prime `p ≡ a (mod q)` is less than `2 (q log q)²`, and asymptotically at most
 (Xylouris: `L = 5`).
 
 **Literature status: RH-consequence.** The GRH ⇒ `2 (q log q)²` bound is Bach–Sorenson (1996,
-constant 2). This is a Lean proof that GRH implies a bound of this shape, following Bach and
-Sorenson; our constant `7/2` is weaker than their `2`. It is not new mathematics.
+constant 2). This repository is a complete Lean proof that GRH implies the bound with constant
+`7/2`, following Bach and Sorenson, with every class for `q < 2^15` covered by a proved-sound
+checker. `Unconditional/` proves it unconditionally in Lean, with GRH supplied by the certified
+proof in leanprover-community/riemann-hypothesis. Our constant is `7/2`; theirs is `2`.
 
 This repository proves, assuming GRH for Dirichlet L-functions
 (`Erdos985.DirichletLNonvanishingRightOfHalf`, copied verbatim from
@@ -175,9 +177,7 @@ module files and needs about 19 GB of RAM. Raise the open-file limit first; on L
 example `sudo prlimit --pid $$ --nofile=2000000:2000000`; on macOS
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
 
-The riemann-hypothesis proof adds no axioms of its own. The cache contains outputs of untrusted
-builds, so this links the proofs but does not re-verify the RH/GRH proof, whose independent
-verification is still pending.
+The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
 
 ## Credits
 
