@@ -156,9 +156,9 @@ ankeny-grh modules used took 1 min 21 s wall (255 CPU-s); the 16 `native_decide`
 
 | Theorem | Statement | Axioms |
 |---|---|---|
-| `bachSorenson_unconditional` | `BachSorenson.BachSorensonBound (7 / 2)` | not yet checked |
+| `bachSorenson_unconditional` | `BachSorenson.BachSorensonBound (7 / 2)` | standard three + 16 `native_decide` |
 
-Not yet run on this box: the check is queued behind other repositories' runs. This table is updated with the real `#print axioms` output once it has run.
+Checked 2026-11-24 with `scripts/check-unconditional.sh` against riemann-hypothesis `507a75d91d`: the build succeeded and `#print axioms bachSorenson_unconditional` printed exactly `propext`, `Classical.choice`, `Quot.sound` and the 16 `BachSorenson.chunk_ok_N._native.native_decide.ax_1_1` axioms (no `sorryAx`). The run took 9 min wall, dominated by importing riemann-hypothesis.
 
 To check it:
 
