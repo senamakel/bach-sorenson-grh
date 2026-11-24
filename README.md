@@ -6,6 +6,10 @@ prime `p ≡ a (mod q)` is less than `2 (q log q)²`, and asymptotically at most
 `(1 + o(1)) (φ(q) log q)²`. Unconditionally only Linnik-type bounds `p ≪ q^L` are known
 (Xylouris: `L = 5`).
 
+**Literature status: RH-consequence.** The GRH ⇒ `2 (q log q)²` bound is Bach–Sorenson (1996,
+constant 2). This is a Lean proof that GRH implies a bound of this shape, following Bach and
+Sorenson; our constant `7/2` is weaker than their `2`. It is not new mathematics.
+
 This repository proves, assuming GRH for Dirichlet L-functions
 (`Erdos985.DirichletLNonvanishingRightOfHalf`, copied verbatim from
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
