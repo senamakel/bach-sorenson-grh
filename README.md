@@ -29,6 +29,9 @@ theorem BachSorenson.bachSorenson_two_of_GRH (hGRH : DirichletLNonvanishingRight
 
 theorem BachSorenson.bachSorenson_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
     BachSorensonBound (7 / 2)
+
+theorem bachSorenson_two_unconditional : BachSorenson.BachSorensonBound 2
+  -- Unconditional/BachSorensonUnconditional.lean
 ```
 
 `BachSorensonBound 2` is the paper's statement, strict inequality included. The `7/2` theorem is
@@ -239,7 +242,7 @@ chunks for `2` took 9, 9, 10, 11, 13, 16, 17, 19, 21, 22, 23, 24, 28, 28, 28 and
 ## Unconditional version
 
 `Unconditional/BachSorensonUnconditional.lean` imports [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-(commit `507a75d`) and closes the hypothesis with its theorem `LFunction_ne_zero_of_half_lt_re`:
+(commit `507a75d91d`) and closes the hypothesis with its theorem `LFunction_ne_zero_of_half_lt_re`:
 
 | Theorem | Statement | Axioms |
 |---|---|---|
