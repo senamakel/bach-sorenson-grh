@@ -23,7 +23,7 @@ def BachSorensonBound (c : ℝ) : Prop :=
   ∀ q a : ℕ, 2 ≤ q → a.Coprime q →
     ∃ p : ℕ, p.Prime ∧ p ≡ a [MOD q] ∧ (p : ℝ) < c * ((q : ℝ) * Real.log q) ^ 2
 
--- `bachSorenson_of_GRH : DirichletLNonvanishingRightOfHalf → BachSorensonBound 4` is proved in
+-- `bachSorenson_of_GRH : DirichletLNonvanishingRightOfHalf → BachSorensonBound (7 / 2)` is proved in
 -- `BachSorenson/Main.lean`. `BachSorensonBound 2` (Bach–Sorenson's constant) is not proved.
 
 end BachSorenson
