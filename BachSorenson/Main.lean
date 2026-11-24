@@ -8,7 +8,8 @@ import BachSorenson.Compute
   `BachSorenson.numericOK_of_ge`).
 * `2 ≤ q < 2^15`: the verified finite computation (`BachSorenson.bachSorenson_small`).
 
-Bach–Sorenson's constant `2` is not reached: see the README for why the constant is `7/2`.
+This Cesàro-weight argument stops at `7/2`; Bach–Sorenson's constant `2` is
+`BachSorenson.bachSorenson_two_of_GRH` (`BachSorenson/Two/Main.lean`).
 -/
 
 namespace BachSorenson

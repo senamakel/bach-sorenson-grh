@@ -21,3 +21,12 @@ name = "BachSorenson"
 [[lean_lib]]
 name = "BachSorensonCheck"
 precompileModules = true
+
+[[require]]
+name = "LLS"
+git = "https://github.com/senamakel/lls-grh.git"
+rev = "b8c5afac3fc273bc1a9fe528d323f65b0e833273"
+
+[[lean_lib]]
+name = "BachSorensonCheck2"
+precompileModules = true

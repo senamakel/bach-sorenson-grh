@@ -91,3 +91,60 @@ Asymptotically the argument compares `x/(2φ)` with `(2/3)√x log q + log 4 · 
 needs `√c > (4/3)(1 + O(1/log q))`: `c > 16/9` in the limit, and `c = 2` only once
 `log q ≳ 64` (`q ≳ 10^28`). Reaching Bach–Sorenson's `2` for all `q` would need their sharper explicit
 formula; see the README.
+
+# Part 2: the constant `2` (`BachSorenson/Two/`)
+
+Target: the same `BachSorensonBound c` with Bach–Sorenson's `c = 2`
+(`bachSorenson_two_of_GRH : DirichletLNonvanishingRightOfHalf → BachSorensonBound 2`).
+
+The Cesàro weight of Part 1 caps the method at `c > 16/9`. Bach and Sorenson (Math. Comp. 65,
+§§3–4) use the weight `(n/x)^a log(x/n)` (Mellin kernel `x^s/(s + a)²`) and sum the zero sums
+over all characters at once, so that `Σ_χ L'/L(1 + a, χ)` has a sign. Here the kernel is
+`x^s/s²` (the log weight `log(x/n)`, for which lls-grh already proves the explicit formula), and
+the shift `a` enters only in the zero-sum bound. Write `S(x, χ) = Σ_{n ≤ x} Λ(n) χ(n) log(x/n)`,
+`Z₂(ψ) = Σ_ρ m_ρ/|ρ|²`, `σ = 1 + a`, `a = 1/20`.
+
+1. **Explicit formula** (lls-grh `LLS.LogAux.log_explicit_formula`, reused): for `ψ` primitive,
+   `S(x, ψ) = −Σ_ρ m_ρ (x^ρ − 1)/ρ² − D(0, ψ) log x + Γ̃(x)`, `D = Λ'/Λ`.
+2. **Zero sums** (`Two/ZeroSum.lean`). Under GRH, on `Re ρ = 1/2`,
+   `Re(1/(σ − ρ) − 1/(1 − ρ)) ≥ −(a/(1 + 2a))/|ρ|²`, so `Re D(1) ≤ Re D(σ) + (a/(1+2a)) Z₂`
+   (`re_D_one_le`). With `Z₂ = log f + Re D(1, ψ) + Re D(1, ψ⁻¹)` (`LLS.Z2_eq`) and
+   `Z₂(ψ⁻¹) = Z₂(ψ)`: `Z₂ ≤ (1 + 2a)(log f + Re D(σ, ψ) + Re D(σ, ψ⁻¹))` (`Z2_le`).
+   Also `‖D(0)‖ ≤ log f + Z₂ + 2.52` (`norm_D_zero_le`: functional equation,
+   `‖D(1) − D(2)‖ ≤ Z₂`, `‖L'/L(2)‖ ≤ Σ Λ(n) n^{-3/2} ≤ 1.52`).
+3. **`L'/L` at `σ`** (`Two/LogDeriv.lean`). `Σ_{χ mod q} Re L'/L(σ, χ) ≤ 0`
+   (`−Σ_χ L'/L = φ(q) Σ_{n ≡ 1} Λ(n) n^{-σ}`), `−Re L'/L(σ, χ) ≤ Σ Λ(n) n^{-σ} ≤ (2/a)(1 + 2/a)
+   = 1640` (`Λ(n) ≤ log n ≤ (2/a) n^{a/2}` and `Σ n^{-1-b} ≤ 1 + 1/b`), so
+   `Σ_{χ ≠ 1}(Re L'/L(σ, χ) + Re L'/L(σ, χ⁻¹)) ≤ 3280`. The primitive `ψ` and the lifted `χ`
+   differ by `Σ_{p | q, p ∤ f} log p/(p − 1)` (`re_ld_le_changeLevel`), and
+   `log f + 2 Σ_{p | q, p ∤ f} log p/(p − 1) ≤ log q + log 2`. The gamma factor gives
+   `Re Γ'/Γ-part(21/20) ≤ −0.7` (`re_gammaLogDeriv_le`).
+4. **Per character** (`Two/Character.lean`): `Z₂(ψ_χ) ≤ (11/10)(log q + log 2 − 7/5
+   + Re L'/L(σ, χ) + Re L'/L(σ, χ⁻¹))`, `‖S(x, ψ)‖ ≤ (√x + 1 + log x) Z₂ + (log f + 2.52) log x
+   + log² x/2 + 5 log x + 2`, and lifting to `q` costs at most `ω(q) log² x`.
+5. **Prime powers** (`Two/PrimePowers.lean`): `Σ_{n ≤ x, n not prime} Λ(n) log(x/n) ≤
+   log 4 (2x^{1/2} + 3x^{1/3} + 60x^{1/4} + (log₂ x)² x^{1/12})`, grouping `n = p^k` by `k` and
+   `Σ_{p ≤ y} log p · log(y/p) ≤ y log 4` (summation by parts on Chebyshev's `θ`).
+6. **One modulus** (`Two/Large.lean`): orthogonality, the principal character from
+   `LLS.psiLog_ge` (`Σ_{n ≤ x} Λ(n) log(x/n) ≥ x − (3/20)√x − 3 log x − 3`), and
+   `NumericOK2 q` (the resulting inequality at `x = ⌊2(q log q)²⌋`) give a prime `p < x`.
+7. **Numerics** (`Two/Numerics.lean`): `NumericOK2 q` for `q ≥ 2^15`. With `s = √x`, `U = q log q`:
+   `s ≥ 1.41421 U`, the leading terms give `s(s − 1.1U − 1.9951q) ≥ 1.27 q s`, and the rest is
+   at most `0.41 q s` (`u = x^{1/12} ≥ 8.8`, `log u ≤ 0.248 u`).
+8. **Finite range** (`BachSorensonCheck2.lean`, `Checker2.lean`, `Compute2*.lean`): 16
+   `native_decide` chunks, every class for `2 ≤ q < 2^15` below
+   `bound2 q = ⌊2 q² (⌊log₂ q⁸⌋ · 0.6931471803/8)²⌋ ≤ 2 (q log q)²`.
+
+## Sizing for constant `2` (outside Lean)
+
+Margin of the Lean inequality per unit `q√x` (positive means `NumericOK2 q` holds), with the
+constants above (`a = 1/20`, crude `Σ Λ(n) n^{-σ} ≤ 1640`):
+
+| q      | 2^13  | 2^14 | 2^15 | 2^16 | 10^6 | 10^12 |
+|--------|-------|------|------|------|------|-------|
+| margin | 0.08  | 0.64 | 1.04 | 1.36 | 2.34 | 6.71  |
+
+The smallest `q₀` for which the inequality holds from then on, for other `c` (same bounds):
+`c = 2`: `≈ 7300`; `c = 5/2`: `≈ 2800`; `c = 3`: `≈ 1800`. The finite check below `2^15`
+costs about `1.9·10^9` progression steps (a C sieve does it in 28 s); the largest least prime is
+`6188401`, and the largest `p/(2(q log q)²)` is `0.78`, at `q = 2`.
