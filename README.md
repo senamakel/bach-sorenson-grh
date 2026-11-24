@@ -1,21 +1,21 @@
 # The least prime in a residue class under GRH in Lean
 
-E. Bach and J. Sorenson (*Explicit bounds for primes in residue classes*, Math. Comp. 65 (1996),
-1717–1735) proved, assuming the Extended Riemann Hypothesis, that if `gcd(a, q) = 1` the least
-prime `p ≡ a (mod q)` is less than `2 (q log q)²`, and asymptotically at most
-`(1 + o(1)) (φ(q) log q)²`. Unconditionally only Linnik-type bounds `p ≪ q^L` are known
-(Xylouris: `L = 5`).
+For every `q ≥ 2` and every `a` coprime to `q`, there is a prime `p ≡ a (mod q)` with
+`p < (7/2) (q log q)²`. This repository proves that bound in Lean under GRH for Dirichlet
+L-functions, and `Unconditional/` proves it unconditionally in Lean, with GRH supplied by the
+certified proof in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+Moduli `q < 2^15` are covered by a checker whose soundness is proved in Lean.
 
-**Literature status: RH-consequence.** The GRH ⇒ `2 (q log q)²` bound is Bach–Sorenson (1996,
-constant 2). This repository is a complete Lean proof that GRH implies the bound with constant
-`7/2`, following Bach and Sorenson, with every class for `q < 2^15` covered by a proved-sound
-checker. `Unconditional/` proves it unconditionally in Lean, with GRH supplied by the certified
-proof in leanprover-community/riemann-hypothesis. Our constant is `7/2`; theirs is `2`.
+**Literature status: RH-consequence.** E. Bach and J. Sorenson (*Explicit bounds for primes in
+residue classes*, Math. Comp. 65 (1996), 1717–1735) proved, assuming the Extended Riemann
+Hypothesis, that the least prime `p ≡ a (mod q)` is less than `2 (q log q)²`, and asymptotically
+at most `(1 + o(1)) (φ(q) log q)²`. The Lean proof follows their argument. Our constant is
+`7/2`; theirs is `2` (see "Deviations from the literature"). Without a hypothesis, the known
+bounds are of Linnik type, `p ≪ q^L` (Xylouris: `L = 5`).
 
-This repository proves, assuming GRH for Dirichlet L-functions
-(`Erdos985.DirichletLNonvanishingRightOfHalf`, copied verbatim from
-[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-`src/Statements.lean`):
+GRH enters as `Erdos985.DirichletLNonvanishingRightOfHalf`, copied verbatim from
+riemann-hypothesis `src/Statements.lean`:
 
 ```lean
 def BachSorenson.BachSorensonBound (c : ℝ) : Prop :=
@@ -24,12 +24,12 @@ def BachSorenson.BachSorensonBound (c : ℝ) : Prop :=
 
 theorem BachSorenson.bachSorenson_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
     BachSorensonBound (7 / 2)
+
+theorem bachSorenson_unconditional : BachSorenson.BachSorensonBound (7 / 2)
+  -- Unconditional/BachSorensonUnconditional.lean
 ```
 
-So, under GRH, **for every `q ≥ 2` and every `a` coprime to `q` there is a prime `p ≡ a (mod q)`
-with `p < 3.5 (q log q)²`**. This is Bach–Sorenson's theorem with the constant `2` replaced by
-`7/2` (see "Deviations from the literature"). `BachSorensonBound 2`, the literature statement,
-is not proved. There is no `sorry`.
+`BachSorensonBound 2`, the paper's statement, is not proved here. The repository has no `sorry`.
 
 ## Tier and provenance
 
@@ -137,7 +137,7 @@ modulus beyond which a given `c` works up fast. Sized outside Lean with the boun
 Every `q < Q₀` must be covered by computation, which costs about `Σ_{q<Q₀} φ(q)` progression
 walks: `2·10^9` table lookups at `Q₀ = 2^15`, growing like `Q₀²`. `c = 2` would need the sharper
 explicit formula Bach and Sorenson use (a different weight, sharper zero-sum and gamma-factor
-estimates). Redoing the erdos-985 analytic layer that way was out of scope.
+estimates). This repository does not redo the erdos-985 analytic layer that way.
 
 The statement requires `2 ≤ q`, which the paper leaves implicit; for `q = 1` its bound is `0`.
 The bound is strict, as in the paper.
@@ -158,7 +158,7 @@ ankeny-grh modules used took 1 min 21 s wall (255 CPU-s); the 16 `native_decide`
 ## Unconditional version
 
 `Unconditional/BachSorensonUnconditional.lean` imports [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
-(commit `507a75d`) and closes the hypothesis with its theorem `LFunction_ne_zero_of_half_lt_re`:
+(commit `507a75d91d`) and closes the hypothesis with its theorem `LFunction_ne_zero_of_half_lt_re`:
 
 | Theorem | Statement | Axioms |
 |---|---|---|
