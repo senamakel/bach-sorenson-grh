@@ -1,41 +1,43 @@
-# The least prime in a residue class under GRH in Lean
+# Bach–Sorenson's least prime in a residue class under GRH in Lean
 
-Lean proves Bach and Sorenson's theorem with their constant: assuming GRH for Dirichlet
-L-functions, for every modulus `q ≥ 2` and every `a` coprime to `q` there is a prime
-`p ≡ a (mod q)` with `p < 2 (q log q)²`. With the certified Lean proof of GRH,
-`Unconditional/` proves it unconditionally in Lean. The theorem is E. Bach and J. Sorenson,
-*Explicit bounds for primes in residue classes*, Math. Comp. 65 (1996), 1717–1735 (abstract and
-§5: "the least prime `p ≡ m (mod q)` is less than `2(q log q)²`"), who also prove
-`p ≤ (1 + o(1)) (φ(q) log q)²`; GRH for Dirichlet L-functions is L. Alpöge's (2026). Without GRH
-the known bounds are of Linnik type, `p ≪ q^L` (Xylouris: `L = 5`).
+This repository proves Bach and Sorenson's theorem in Lean with their constant `2`: for every
+modulus `q ≥ 2` and every `a` coprime to `q` there is a prime `p ≡ a (mod q)` with
+`p < 2 (q log q)²`. The main library is a complete Lean proof that GRH for Dirichlet
+L-functions implies the bound, and `Unconditional/` proves it unconditionally in Lean with the
+certified proof of GRH by L. Alpöge in
+[leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis).
+The theorem is E. Bach and J. Sorenson, *Explicit bounds for primes in residue classes*,
+Math. Comp. 65 (1996), 1717–1735 (abstract and §5: "the least prime `p ≡ m (mod q)` is less
+than `2(q log q)²`"), who also prove `p ≤ (1 + o(1)) (φ(q) log q)²`. Without GRH the known
+bounds are of Linnik type, `p ≪ q^L` (Xylouris: `L = 5`).
 
-**Literature status: RH-consequence.** The main library is a complete Lean proof that GRH
-implies Bach–Sorenson's bound, constant `2` included, following Bach and Sorenson's method of
-summing the zero sums over all characters at `s = 1 + a`; every class for `q < 2^15` is checked
-by a proved-sound checker. `Unconditional/` proves the bound unconditionally in Lean with the
-certified proof of GRH.
+Literature status: RH-consequence. The proof follows Bach and Sorenson's method of summing the
+zero sums over all characters at `s = 1 + a`. A proved-sound checker covers every class for
+`q < 2^15`, and the analytic argument covers `q ≥ 2^15`. There is no `sorry`.
 
 GRH enters as `Erdos985.DirichletLNonvanishingRightOfHalf`, copied verbatim from
 [leanprover-community/riemann-hypothesis](https://github.com/leanprover-community/riemann-hypothesis)
 `src/Statements.lean`:
 
 ```lean
-def BachSorenson.BachSorensonBound (c : ℝ) : Prop :=
+def BachSorenson.BachSorensonBound (c : ℝ) : Prop :=   -- BachSorenson/Statement.lean
   ∀ q a : ℕ, 2 ≤ q → a.Coprime q →
     ∃ p : ℕ, p.Prime ∧ p ≡ a [MOD q] ∧ (p : ℝ) < c * ((q : ℝ) * Real.log q) ^ 2
 
 theorem BachSorenson.bachSorenson_two_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
-    BachSorensonBound 2
-
-theorem BachSorenson.bachSorenson_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
-    BachSorensonBound (7 / 2)
+    BachSorensonBound 2                                -- BachSorenson/Two/Main.lean
 
 theorem bachSorenson_two_unconditional : BachSorenson.BachSorensonBound 2
   -- Unconditional/BachSorensonUnconditional.lean
 ```
 
-`BachSorensonBound 2` is the paper's statement, strict inequality included. The `7/2` theorem is
-the first version of this repository (Cesàro weight); `2` implies it. There is no `sorry`.
+`BachSorensonBound 2` is the paper's statement, strict inequality included. The library also
+keeps an earlier, weaker theorem with constant `7/2`, which `BachSorensonBound 2` implies:
+
+```lean
+theorem BachSorenson.bachSorenson_of_GRH (hGRH : DirichletLNonvanishingRightOfHalf) :
+    BachSorensonBound (7 / 2)                          -- BachSorenson/Main.lean
+```
 
 ## Tier and provenance
 
@@ -107,7 +109,7 @@ of the primes below `8·10^6` by trial division and then, for every `a < q` copr
 The chunks take 9 to 30 s each, about 5 CPU-minutes in total. The analytic half (`q ≥ 2^15`,
 `exists_prime_of_numericOK2`, `numericOK2_of_ge`) uses only the standard three axioms.
 
-`bachSorenson_of_GRH` (constant `7/2`) uses the 16 chunks `chunk_ok_N` of the first checker
+The constant-`7/2` theorem `bachSorenson_of_GRH` uses the 16 chunks `chunk_ok_N` of the first checker
 (`checkRange`, bound `(7/2)(q log q)²`, about 6.5 CPU-minutes). ankeny-grh's and lls-grh's own
 `native_decide` axioms do not appear: only their analytic modules are imported.
 
@@ -144,8 +146,13 @@ The full blueprint is [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md), Part 2. Write
    `6188401`; the largest ratio `p/(2 (q log q)²)` is `0.78`, at `q = 2`.
 9. `BachSorenson/Two/Main.lean`: `bachSorenson_two_of_GRH`.
 
-### Constant `7/2` (the first version)
+### Constant `7/2` (`BachSorenson/`)
 
+This is the earlier, weaker theorem. It uses the Cesàro weight `1 − n/x` with erdos-985's
+zero-sum bound `Σ_ρ 1/|ρ(ρ+1)| ≤ (2/3)(log f + 5/3)` per character. That needs
+`√c > (4/3)(1 + O(1/log q))`, so `c > 16/9` in the limit and `c = 2` only for `q ≳ 10^28`;
+the per-character bound stops this route at `7/2`. Summing the zero sums over all characters
+at `s = 1 + a`, as Bach and Sorenson do, removes that barrier and gives the constant `2` above.
 
 The analytic toolkit (weighted explicit formula, zero-sum bound under GRH, principal-character
 bound) is [erdos-985](https://github.com/senamakel/erdos-985); the primitive-character bound and
@@ -195,35 +202,31 @@ lake dependencies. The full blueprint, with each step's Lean statement, is
 | `BachSorenson/Two/Main.lean` | `bachSorenson_two_of_GRH` |
 | `Unconditional/BachSorensonUnconditional.lean` | GRH discharged by riemann-hypothesis |
 
-## Deviations from the literature
+## Differences in the proof
 
-The constant is Bach–Sorenson's `2`, the inequality is strict as in the paper, and the only
-added hypothesis is `2 ≤ q`, which the paper leaves implicit (for `q = 1` its bound is `0`).
+The statement is the paper's. The route to it differs from Bach and Sorenson's in three places.
 
-The route differs from theirs in three places, none of which changes the statement:
-
-* **Kernel.** Bach–Sorenson use the weight `(n/x)^a log(x/n)` (kernel `x^s/(s + a)²`) and
-  optimise `a` numerically for each range of `q`. Here the weight is `log(x/n)` (`a = 0` in the
-  explicit formula, which lls-grh already proves) and the shift `a = 1/20` is used only to bound
-  the zero sum, through `|ρ + a|² ≤ (1 + 2a)²|ρ|²`. This costs the factor `1 + 2a = 1.1` on the
-  leading term: the method needs `√c > 1.1`, against Bach–Sorenson's `√c > 1 + o(1)`.
-* **Explicit inputs.** Prime powers use Chebyshev's `θ(y) ≤ y log 4` (Mathlib) where
-  Bach–Sorenson use Costa Pereira's `ψ − θ < 1.001√t + (4/3)t^{1/3}`; and
-  `Σ Λ(n) n^{-21/20} ≤ 1640` is crude (`−ζ'/ζ(21/20) ≈ 19.4`). These raise the modulus from
-  which the analytic argument works.
-* **Finite range.** Bach–Sorenson's analytic bound holds for `q ≥ 1000` and they check
-  `q ≤ 1000` by computer (largest ratio `1.56`). Here the analytic part needs `q ≥ 2^15` and the
+* Bach and Sorenson use the weight `(n/x)^a log(x/n)` (kernel `x^s/(s + a)²`) and optimise `a`
+  numerically for each range of `q`. Here the weight is `log(x/n)` (`a = 0` in the explicit
+  formula, which lls-grh already proves), and the shift `a = 1/20` is used only to bound the
+  zero sum, through `|ρ + a|² ≤ (1 + 2a)²|ρ|²`. This costs the factor `1 + 2a = 1.1` on the
+  leading term: the method needs `√c > 1.1`, against Bach and Sorenson's `√c > 1 + o(1)`.
+* Prime powers use Chebyshev's `θ(y) ≤ y log 4` (Mathlib) where Bach and Sorenson use Costa
+  Pereira's `ψ − θ < 1.001√t + (4/3)t^{1/3}`, and `Σ Λ(n) n^{-21/20} ≤ 1640` is a crude bound
+  (`−ζ'/ζ(21/20) ≈ 19.4`). These raise the modulus from which the analytic argument works.
+* Bach and Sorenson's analytic bound holds for `q ≥ 1000`, and they check `q ≤ 1000` by
+  computer (largest ratio `1.56`). Here the analytic part needs `q ≥ 2^15`, and the
   proved-sound checker covers every class for `q < 2^15` (largest ratio `0.78`, at `q = 2`).
 
 Sizing for this method, outside Lean: the inequality of `NumericOK2` holds from about `q = 7300`
 on for `c = 2` (margin `0.64` per unit `q√x` at `2^14`, `1.04` at `2^15`); for `c = 5/2` from
 about `2800`, for `c = 3` from about `1800`. See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md).
 
-For the constant `7/2` the first version used the Cesàro weight `1 − n/x` with erdos-985's
-zero-sum bound `Σ_ρ 1/|ρ(ρ+1)| ≤ (2/3)(log f + 5/3)` per character. That needs
-`√c > (4/3)(1 + O(1/log q))`, so `c > 16/9` in the limit and `c = 2` only for `q ≳ 10^28`; the
-per-character bound is why it stopped at `7/2`. Summing the zero sums over all characters at
-`s = 1 + a`, as Bach and Sorenson do, is what removes that barrier.
+## Deviations from the literature
+
+None. The constant is Bach and Sorenson's `2` and the inequality is strict, as in the paper.
+The only added hypothesis is `2 ≤ q`, which the paper leaves implicit (for `q = 1` its bound is
+`0`).
 
 ## Building
 
@@ -258,8 +261,8 @@ scripts/check-unconditional.sh /path/to/riemann-hypothesis   # cloned there if m
 ```
 
 The script uses that project's community cache, about 93 GB. The import opens around 900,000
-module files and needs about 19 GB of RAM. Raise the open-file limit first; on Linux, for
-example `sudo prlimit --pid $$ --nofile=2000000:2000000`; on macOS
+module files and needs about 19 GB of RAM. Raise the open-file limit first: on Linux,
+`sudo prlimit --pid $$ --nofile=2000000:2000000`; on macOS
 `sudo sysctl -w kern.maxfiles=2000000 kern.maxfilesperproc=1500000 kern.maxvnodes=1500000`.
 
 The riemann-hypothesis proof adds no axioms of its own. It was certified by the Lean FRO and the Mathlib Initiative on 2026-11-21, and independent kernels accept it (math.mit.edu/~drew/grh). This check links against the community build cache and does not repeat those kernel checks.
